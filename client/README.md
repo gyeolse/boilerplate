@@ -48,6 +48,103 @@
 ## [3] routing 처리
 
 - `npm i react-router-dom`
+- `index.js`에서 Router 관련 설정
 
-| `npm` | `npx` |
-| ----- | ----- |
+  ```javascript
+  <Switch>
+    <Route exact path="/" component={LandingPage} />
+    <Route exact path="/login" component={LoginPage} />
+    <Route exact path="/register" component={RegisterPage} />
+  </Switch>
+  ```
+
+  **문제** : 선언은 `import { BrowserRouter as Router, Route, Switch } from "react-router-dom";`로 해주어야 한다!
+
+## [4] Axios 및 CORS issue, proxy 설정
+
+- `npm i axios`
+- CORS policy에 의해 막힌 이유
+  - 서버 포트 5000, 클라이언트는 3000. 포트가 다름. 다른 웹에서 서버에 request를 보내면 보안적 이슈가 생기므로 CORS 정책이 필요함.
+  - origin이 다른데 resource를 sharing할 때, 설정을 해주어야함.
+  - 해결하는 방법 중 `proxy 설정`을 사용함. 임의로 proxy 설정. 모듈 다운로드가 필요함
+    - client 부분에서 `npm install http-proxy-middleware --save` 설치
+    - src/setupProxy.js 파일 생성
+    ```javascript
+    const proxy = require("http-proxy-middleware");
+    module.exports = function (app) {
+      app.use(
+        "/api",
+        proxy({
+          target: "http://localhost:5000",
+          changeOrigin: true,
+        })
+      );
+    };
+    ```
+  - proxy가 무엇인가?
+    - User <=> Proxy Server <=> 인터넷
+    - 아이피를 프록시 서버에서 임의로 변경 간으. 인터넷에 접근하는 사람의 IP를 모르게됨. 보내는 데이터도 임의로 바꿀수 있음. 방화벽/ 웹 필터/ 캐쉬 데이터/ 공유 데이터 제공 기능 등...
+    - 그 외, 직원/집안에서 아이들인터넷 제어, 캐쉬를 이용한 더 빠른 인터넷 제공, 더 나은 보안 제공, 이용 제한된 사이트 접근 가능 등...
+
+## [5] Concurrently
+
+- 서버와 프론트를 한 번에 키도록 함
+- `npm install concurrently`
+- 서버 쪽 `package.json`에서 concurrently 관련 설정
+  `"dev": "concurrently \"npm run backend\" \"cd ../client && npm run start\""`
+- `npm run dev`
+
+## [6] Antd CSS Framework
+
+- MaterialUI / React Bootstrap / Semantic / Ant..etc
+- size가 크지만, 깔끔하고, Enterprise 환경에서도 어울리는 디자인 만들어내기 가능. 쓰기 편리함
+- `npm install antd --save`
+- `import 'antd/dist/antd.css'` 를 index.js에 넣기
+
+## [7] Redux
+
+- 상태 관리 라이브러리. 한 방향
+- `{type: '' , articleId: value}` 이런 식으로 사용
+- 이전 state, action object를 받은 후, next state를 return
+- `npm i redux, react-redux, redux-promise, redux-thunk --save`
+- redux middleware : 리덕스를 유용하게 쓰기 위한 역할. redux store안에 모든 state를 관리하는데, state를 변경하고 싶을 때, dispath를 이용해서 action으로 변경을 시킬 수 있음.
+- action은 객체 형식이어야 함. store에서 객체 형식을 언제나 받는 것이 아니라, promise 형식으로 된 것/ function으로 된 것을 받을 때도 있음. 이럴 때는 store가 받지를 못하니. **`middleware`**가 필요한 것
+- redux-promise : promise가 왔을 때의 대처법
+- redux-thunk : function이 왔을 때의 대처법
+- `index.js`에서 redux 적용 및 middleware 적용
+
+  ```javascript
+  import { Provider } from "react-redux";
+  import { applyMiddleware, createStore } from "redux";
+  import promiseMiddleware from "redux-promise"; //middle ware
+  import ReduxThunk from "redux-thunk"; //middle ware
+  const createStoreWithMiddleware = applyMiddleware(
+    promiseMiddleware,
+    ReduxThunk
+  )(createStore);
+  ```
+
+  ```javascript
+    <Provider
+    store={createStoreWithMiddleware(
+      Reducer,
+      window.__REDUX_DEVTOOLS_EXTENSION__ &&
+        window.__REDUX_DEVTOOLS_EXTENSION__()
+    )}
+  >
+    <App />
+    </Provider>,
+  ```
+
+  - `_reducers/index.js`에 해당 코드 입력
+
+  ```javascript
+
+  ```
+
+  - combineReducer => Root Reducer로 하나로 합쳐줌. login, logout 기능들,,,, 하나로 합쳐주는 그런 기능
+
+- | `npm` | `npx` |
+  | ----- | ----- |
+
+## [8] LoginPage
