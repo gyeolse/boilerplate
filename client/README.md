@@ -144,7 +144,77 @@
 
   - combineReducer => Root Reducer로 하나로 합쳐줌. login, logout 기능들,,,, 하나로 합쳐주는 그런 기능
 
-- | `npm` | `npx` |
-  | ----- | ----- |
-
 ## [8] LoginPage
+
+- reducer : dispatch 함수 호출 `dispatch = useDispatch()`
+
+```javascript
+dispatch(loginUser(body)).then((response) => {
+  if (response.payload.loginSuccess) {
+    props.history.push("/");
+  } else {
+    alert("error");
+  }
+});
+```
+
+- loginUser actions
+
+```javascript
+const request = axios
+  .post("/api/users/login", dataToSubmit)
+  .then((response) => response.data);
+
+return {
+  type: LOGIN_USER,
+  payload: request,
+};
+```
+
+- type에 따른 분기 처리
+
+```javascript
+export default function (state = {}, action) {
+  //다른 type이 올떄마다 , 다른 처리를 해주어야 하므로
+  switch (action.type) {
+    case LOGIN_USER:
+      return { ...state, loginSuccess: action.payload };
+      break;
+
+    default:
+      return state;
+  }
+}
+```
+
+## [9] RegisterPage
+
+## [10] logout
+
+- 로그아웃 기능 : landingpage에서 버튼 만들고, 로그아웃 구현
+
+## [11] 인증처리
+
+- 아무나 진입 가능한 페이지
+- 로그인한 회원만 진입 가능한 페이지
+- 로그인 한 회원은 진입 못하는 페이지
+- 관리자만 진입 가능한 페이지
+
+그 외 커멘트, 파일 전송, 파일 업로드 등등
+
+`hoc` 컴포넌트를 써야함.
+
+### auth(hoc) 컴포넌트에서
+
+- backend에 요청 -> 해당 페이지에 들어가있는 사용자에 대한 정보를 받아옴
+- 접근할 수 있는 사용자라면, 다른 곳으로 우회시키도록 해야함.
+- 로그인 페이지라면, 로그인 페이지에 접근한 사람의 상태를 확인하도록 해야함.
+
+- App.js에서 각 컴포넌트를 감싸주도록함. + 옵션
+  //option : null, true, false (null은 아무나 , true는 login한 유저, false는 로그인 유저는 출입 불가능)
+
+### reducer,
+
+### login Page `withRouter`로 hoc
+
+history가 react-router-dom을 이용해서 쓰고 잇어서, withrouter를 써야 함

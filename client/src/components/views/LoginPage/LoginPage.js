@@ -1,6 +1,13 @@
 import React, { useState } from "react";
+import Axios from "axios";
+import { useDispatch } from "react-redux"; //reducer
+import { loginUser } from "../../../_actions/user_action";
+import { withRouter } from "react-router-dom";
 
-function LoginPage() {
+function LoginPage(props) {
+  //1.
+  const dispatch = useDispatch();
+
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
 
@@ -10,7 +17,20 @@ function LoginPage() {
   const onPasswordHandler = (e) => {
     setPassword(e.currentTarget.value);
   };
-  const onSubmitHandler = (e) => {};
+  const onSubmitHandler = (e) => {
+    e.preventDefault(); //Page Refresh를 막아줌
+    let body = {
+      email: Email,
+      password: Password,
+    };
+    dispatch(loginUser(body)).then((response) => {
+      if (response.payload.loginSuccess) {
+        props.history.push("/");
+      } else {
+        alert("error");
+      }
+    });
+  };
   return (
     <div
       style={{
@@ -35,4 +55,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default withRouter(LoginPage);
